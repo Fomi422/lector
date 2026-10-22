@@ -20,17 +20,18 @@
   --bg:#f2f4f6; --paper:#ffffff; --ink:#18263a; --muted:#5d6b7d; --line:#d9dfe6;
   --accent:#b8780f; --accent-soft:#f6e7c8; --verb:#2f5f9e; --verb-soft:#dde8f6;
   --good:#2e7d4f; --bad:#b4423a;
+  --t-pres:#2f5f9e; --t-imp:#1c7a6e; --t-indef:#b4423a; --t-perf:#7a4fa8; --t-subj:#b0407a; --t-cond:#6b7a1e; --t-oth:#5d6b7d;
   --f-read:"Literata", Georgia, "Times New Roman", serif;
   --f-ui:"Onest", system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
   --bg:#11161d; --paper:#18202a; --ink:#e7ecf2; --muted:#9aa7b6; --line:#2a3644;
   --accent:#e2a640; --accent-soft:#3a2f1a; --verb:#8db6ec; --verb-soft:#1f3049;
-  --good:#5cc08a; --bad:#e2766c; color-scheme:dark}}
+  --good:#5cc08a; --bad:#e2766c; --t-pres:#8db6ec; --t-imp:#5fc9b8; --t-indef:#ef8a7f; --t-perf:#c29ae8; --t-subj:#ec8cbf; --t-cond:#bccb5e; --t-oth:#9aa7b6; color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#11161d; --paper:#18202a; --ink:#e7ecf2; --muted:#9aa7b6; --line:#2a3644;
   --accent:#e2a640; --accent-soft:#3a2f1a; --verb:#8db6ec; --verb-soft:#1f3049;
-  --good:#5cc08a; --bad:#e2766c; color-scheme:dark}
+  --good:#5cc08a; --bad:#e2766c; --t-pres:#8db6ec; --t-imp:#5fc9b8; --t-indef:#ef8a7f; --t-perf:#c29ae8; --t-subj:#ec8cbf; --t-cond:#bccb5e; --t-oth:#9aa7b6; color-scheme:dark}
 html,body{background:var(--bg);color:var(--ink)}
 body{font-family:var(--f-ui);font-size:15px;line-height:1.5;
   padding-left:max(16px, env(safe-area-inset-left, 0px));
@@ -69,7 +70,7 @@ details.gist summary{cursor:pointer;font-weight:600;color:var(--ink)}
 .sheet{position:fixed;left:0;right:0;bottom:0;z-index:20;background:var(--paper);border-top:1px solid var(--line);
   box-shadow:0 -10px 30px rgba(0,0,0,.12);border-radius:18px 18px 0 0;
   padding:14px max(16px, env(safe-area-inset-right, 0px)) calc(16px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px));
-  max-height:72vh;overflow:auto}
+  max-height:85vh;overflow:auto}
 .sheet-in{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:10px}
 .sh-top{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .sh-word{font:italic 600 1.6rem var(--f-read)}
@@ -106,6 +107,42 @@ details.gist summary{cursor:pointer;font-weight:600;color:var(--ink)}
 .empty{background:var(--paper);border:1px dashed var(--line);border-radius:14px;padding:24px 20px;color:var(--muted)}
 .empty b{color:var(--ink)}
 h2{font:600 .78rem var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:6px 0 0}
+body.verbs .w[data-t]{color:var(--tc);box-shadow:inset 0 -2px 0 var(--tc);font-weight:600}
+body.verbs .w[data-t].sel{background:var(--tc);color:var(--paper)}
+.w[data-t="pres"],.lg[data-t="pres"]{--tc:var(--t-pres)} .w[data-t="imp"],.lg[data-t="imp"]{--tc:var(--t-imp)}
+.w[data-t="indef"],.lg[data-t="indef"]{--tc:var(--t-indef)} .w[data-t="perf"],.lg[data-t="perf"]{--tc:var(--t-perf)}
+.w[data-t="subj"],.lg[data-t="subj"]{--tc:var(--t-subj)} .w[data-t="cond"],.lg[data-t="cond"]{--tc:var(--t-cond)}
+.w[data-t="oth"],.lg[data-t="oth"]{--tc:var(--t-oth)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 12px;font-size:.8rem;color:var(--muted)}
+.lg{display:inline-flex;align-items:center;gap:5px}
+.lg::before{content:"";width:10px;height:10px;border-radius:3px;background:var(--tc)}
+.topics{display:flex;flex-direction:column;gap:6px}
+.topic-link{display:flex;align-items:center;gap:8px;text-align:left;border:1px solid var(--line);background:var(--paper);color:var(--ink);font:500 .92rem var(--f-ui);padding:9px 12px;border-radius:10px;cursor:pointer}
+.topic-link::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--tc,var(--muted));flex:none}
+.topic-link span{margin-left:auto;color:var(--muted)}
+.back{align-self:flex-start;border:0;background:transparent;color:var(--muted);font:500 .9rem var(--f-ui);cursor:pointer;padding:4px 0}
+.gc{display:flex;flex-direction:column;gap:12px}
+.gc h3{margin:0;font:italic 600 1.45rem var(--f-read);color:var(--tc,var(--ink))}
+.gc .gru{color:var(--muted);font-size:.9rem;margin-top:-8px}
+.gc h4{margin:4px 0 0;font:600 .74rem var(--f-ui);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.gc ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px;font-size:.95rem}
+.gc i{font-family:var(--f-read)}
+.tbl{overflow-x:auto;border:1px solid var(--line);border-radius:10px}
+.tbl table{border-collapse:collapse;width:100%;font-size:.9rem;font-variant-numeric:tabular-nums}
+.tbl th,.tbl td{padding:6px 10px;text-align:left;border-top:1px solid var(--line);white-space:nowrap}
+.tbl tr:first-child th{border-top:0;background:var(--bg);font-weight:600}
+.tbl td:first-child{color:var(--muted)}
+.trap{background:var(--accent-soft);border-radius:10px;padding:10px 12px;font-size:.92rem}
+.ex{font-family:var(--f-read);font-size:.98rem;line-height:1.6;border-left:3px solid var(--tc,var(--line));padding-left:10px}
+.ex mark{background:transparent;color:var(--tc,var(--accent));font-weight:600}
+.ex small{display:block;font-family:var(--f-ui);color:var(--muted);font-size:.84rem}
+.glist{display:flex;flex-direction:column;gap:10px}
+.glist details{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:12px 16px}
+.glist summary{cursor:pointer;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;list-style:none}
+.glist summary::-webkit-details-marker{display:none}
+.glist summary b{font:italic 600 1.1rem var(--f-read);color:var(--tc,var(--ink))}
+.glist summary span{color:var(--muted);font-size:.88rem}
+.glist details[open] summary{margin-bottom:12px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -121,6 +158,7 @@ h2{font:600 .78rem var(--f-ui);letter-spacing:.08em;text-transform:uppercase;col
   <div class="tabs" role="tablist">
     <button role="tab" id="tab-read" aria-selected="true">Чтение</button>
     <button role="tab" id="tab-cards" aria-selected="false">Карточки</button>
+    <button role="tab" id="tab-gram" aria-selected="false">Времена</button>
   </div>
 
   <section id="view-read" style="display:flex;flex-direction:column;gap:14px">
@@ -132,12 +170,17 @@ h2{font:600 .78rem var(--f-ui);letter-spacing:.08em;text-transform:uppercase;col
     <input type="file" id="file-in" accept=".json,application/json" hidden>
     <div id="reader" style="display:flex;flex-direction:column;gap:14px">
     <div class="chips" id="chips">
-      <label class="toggle"><input type="checkbox" id="verbs-toggle"> Глаголы</label>
+      <label class="toggle"><input type="checkbox" id="verbs-toggle"> Времена глаголов</label>
     </div>
+    <div class="legend" id="legend" hidden></div>
     <p class="hint">Сначала попробуйте понять сами. Нажмите на слово — перевод, начальная форма и разбор времени глагола.</p>
     <article id="article"></article>
     </div>
     <p class="src"><span id="src-title"></span> · хранится только на этом устройстве · <label for="file-in" style="text-decoration:underline;cursor:pointer">загрузить другой файл</label></p>
+  </section>
+
+  <section id="view-gram" hidden>
+    <div class="glist" id="glist"></div>
   </section>
 
   <section id="view-cards" hidden>
@@ -149,6 +192,7 @@ h2{font:600 .78rem var(--f-ui);letter-spacing:.08em;text-transform:uppercase;col
   <div class="sheet-in" id="sheet-in"></div>
 </div>
 
+<script src="grammar.js"></script>
 <script>
 let ENTRIES=[], D={};
 
@@ -171,8 +215,9 @@ function renderSentence(es,sid){
     const k=m[0].toLowerCase(), d=D[k]||[];
     const cls=["w"]; if(S.cards[k])cls.push("card"); else if(S.known[k])cls.push("known");
     if(d[1]&&d[1].startsWith("гл")||d[1]==="вспом. гл.")cls.push("verb");
+    const t=(d[1]&&(d[1].startsWith("гл")||d[1]==="вспом. гл."))?tenseOf(d):"";
     if(d[1]==="лат.")cls.push("lat");
-    out+=`<span class="${cls.join(" ")}" tabindex="0" role="button" data-k="${k}" data-s="${sid}">${esc(m[0])}</span>`;
+    out+=`<span class="${cls.join(" ")}" tabindex="0" role="button" data-k="${k}" data-s="${sid}"${t?` data-t="${t}"`:""}>${esc(m[0])}</span>`;
     last=m.index+m[0].length;
   }
   return out+esc(es.slice(last));
@@ -222,6 +267,7 @@ function openWord(el){
      <button class="sh-close" aria-label="Закрыть">×</button></div>
    ${d?`<div class="sh-tr">${d[2]||"—"}</div>`:`<div class="sh-tr">Нет в словаре этой главы</div>`}
    ${d&&d[3]?`<div class="gram">${d[3]}</div>`:""}
+   ${d&&d[4]&&d[4].length?`<div class="topics">${d[4].filter(id=>GRAMMAR[id]).map(id=>`<button class="topic-link" data-topic="${id}" data-tc="${GRAMMAR[id].tense}">Справка: ${GRAMMAR[id].name}<span>→</span></button>`).join("")}</div>`:""}
    <button class="sent-btn" id="sb">Показать перевод предложения</button>
    <div class="sent-tr" id="st" hidden>${esc(s[1])}</div>
    <div class="actions">
@@ -230,6 +276,8 @@ function openWord(el){
    </div>`;
   sheet.hidden=false;
   sheetIn.querySelector(".sh-close").onclick=closeSheet;
+  paintTc(sheetIn);
+  sheetIn.querySelectorAll("[data-topic]").forEach(b=>b.onclick=()=>openTopic(b.dataset.topic,el));
   sheetIn.querySelector("#sb").onclick=e=>{document.getElementById("st").hidden=false;e.target.hidden=true;};
   sheetIn.querySelector("#bc").onclick=()=>{
     if(S.cards[k]) delete S.cards[k];
@@ -295,16 +343,73 @@ function renderStats(){
   document.getElementById("stats").textContent=`карточек ${n} · к повтору ${du} · знаю ${kn}`;
   document.getElementById("tab-cards").textContent=du?`Карточки · ${du}`:"Карточки";
 }
+/* ---------- grammar ---------- */
+function tenseOf(d){
+  const t=d[4]||[];
+  if(t.some(x=>x.startsWith("subj")))return"subj";
+  for(const [id,c] of [["imperfecto","imp"],["indefinido","indef"],["perfecto","perf"],["condicional","cond"],["presente","pres"]]) if(t.includes(id))return c;
+  return"oth";
+}
+function paintTc(root){root.querySelectorAll("[data-tc]").forEach(e=>e.style.setProperty("--tc",`var(--t-${e.dataset.tc})`));}
+function examplesFor(id){
+  const out=[];
+  for(const e of ENTRIES)e.paras.forEach(p=>p.forEach(s=>{
+    if(out.length>=4)return;
+    let hit=false,last=0,m,h="";RE.lastIndex=0;
+    while((m=RE.exec(s[0]))){
+      const d=D[m[0].toLowerCase()];
+      h+=esc(s[0].slice(last,m.index));
+      if(d&&d[4]&&d[4].includes(id)){h+=`<mark>${esc(m[0])}</mark>`;hit=true;} else h+=esc(m[0]);
+      last=m.index+m[0].length;
+    }
+    if(hit)out.push(`<div class="ex">${h+esc(s[0].slice(last))}<small>${esc(s[1])}</small></div>`);
+  }));
+  return out;
+}
+function grammarHtml(id,withTitle){
+  const g=GRAMMAR[id]; if(!g)return"";
+  const tb=g.table?`<div class="tbl"><table><tr>${g.table.head.map(h=>`<th>${h}</th>`).join("")}</tr>${g.table.rows.map(r=>`<tr>${r.map(c=>`<td>${c}</td>`).join("")}</tr>`).join("")}</table></div>`:"";
+  const ex=examplesFor(id);
+  return `<div class="gc" data-tc="${g.tense}">
+    ${withTitle?`<h3>${g.name}</h3><div class="gru">${g.ru}</div>`:""}
+    <h4>Когда употребляется</h4><ul>${g.when.map(w=>`<li>${w}</li>`).join("")}</ul>
+    <h4>Как образуется</h4><div>${g.formNote}</div>${tb}
+    ${g.irregular?`<h4>Неправильные формы</h4><div>${g.irregular}</div>`:""}
+    ${g.trap?`<div class="trap"><b>Ловушка.</b> ${g.trap}</div>`:""}
+    ${ex.length?`<h4>Примеры из прочитанного</h4>${ex.join("")}`:""}
+  </div>`;
+}
+function openTopic(id,fromEl){
+  sheetIn.innerHTML=`<div class="sh-top">${fromEl?`<button class="back" id="gback">← к слову «${esc(fromEl.textContent)}»</button>`:""}<button class="sh-close" aria-label="Закрыть">×</button></div>${grammarHtml(id,true)}`;
+  paintTc(sheetIn); sheet.hidden=false; sheet.scrollTop=0;
+  sheetIn.querySelector(".sh-close").onclick=closeSheet;
+  const b=sheetIn.querySelector("#gback"); if(b)b.onclick=()=>openWord(fromEl);
+}
+function renderGrammarList(){
+  const box=document.getElementById("glist");
+  box.innerHTML=`<p class="hint">Справка по временам глагола. Примеры берутся из глав, которые вы загрузили.</p>`+
+    GRAMMAR_ORDER.map(id=>{const g=GRAMMAR[id];return `<details data-tc="${g.tense}"><summary><b>${g.name}</b><span>${g.ru}</span></summary>${grammarHtml(id,false)}</details>`;}).join("");
+  paintTc(box);
+}
+function renderLegend(){
+  const l=document.getElementById("legend");
+  l.innerHTML=TENSE_LEGEND.map(([t,n])=>`<span class="lg" data-t="${t}">${n}</span>`).join("");
+}
+
 function setTab(t){
   document.getElementById("tab-read").setAttribute("aria-selected",t==="read");
   document.getElementById("tab-cards").setAttribute("aria-selected",t==="cards");
   document.getElementById("view-read").hidden=t!=="read";
   document.getElementById("view-cards").hidden=t!=="cards";
-  closeSheet(); if(t==="cards"){showBack=false;renderReview();}
+  document.getElementById("tab-gram").setAttribute("aria-selected",t==="gram");
+  document.getElementById("view-gram").hidden=t!=="gram";
+  closeSheet(); if(t==="cards"){showBack=false;renderReview();} if(t==="gram")renderGrammarList();
 }
 document.getElementById("tab-read").onclick=()=>setTab("read");
 document.getElementById("tab-cards").onclick=()=>setTab("cards");
-document.getElementById("verbs-toggle").onchange=e=>document.body.classList.toggle("verbs",e.target.checked);
+document.getElementById("tab-gram").onclick=()=>setTab("gram");
+document.getElementById("verbs-toggle").onchange=e=>{document.body.classList.toggle("verbs",e.target.checked);document.getElementById("legend").hidden=!e.target.checked;};
+renderLegend();
 
 /* ---------- data file ---------- */
 const DKEY="lector-data-v1";
