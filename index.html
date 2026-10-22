@@ -147,6 +147,33 @@ body.verbs .w[data-t].sel{background:var(--tc);color:var(--paper)}
 .st{display:flex;flex-direction:column;gap:8px}
 .glossed{font-family:var(--f-read);font-size:1rem;line-height:1.65}
 #gloss-btn{margin-top:4px}
+.tabs button{font-size:.86rem;padding:9px 2px}
+.mode{background:var(--paper);border:1px solid var(--line);border-radius:14px;padding:16px;display:flex;flex-direction:column;gap:10px;border-top:3px solid var(--tc)}
+.mode-h{display:flex;flex-direction:column;gap:2px}
+.mode-h b{font:italic 600 1.2rem var(--f-read)}
+.mode-h span{font-size:.84rem;color:var(--muted)}
+.mode p{margin:0;font-size:.92rem}
+.tr-top{display:flex;align-items:center;justify-content:space-between}
+.tr-n{font-size:.85rem;color:var(--muted);font-variant-numeric:tabular-nums}
+.bar{height:4px;background:var(--line);border-radius:4px;overflow:hidden}
+.bar i{display:block;height:100%;background:var(--accent)}
+.tr-q{font-family:var(--f-read);font-size:1.2rem;line-height:1.6}
+.gap{color:var(--accent);font-weight:600}
+.inf{font-family:var(--f-ui);font-size:.85rem;color:var(--muted)}
+.inf-big{font:italic 600 1.8rem var(--f-read);color:var(--accent)}
+.tr-sub{margin-top:8px;display:flex;gap:8px;align-items:center;font-family:var(--f-ui);font-size:1rem}
+.opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.opt{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);background:var(--paper);color:var(--ink);padding:14px 8px;border-radius:12px;cursor:pointer;font-family:var(--f-read)}
+.opt b{font-size:1.15rem;font-weight:600}
+.opt small{font:500 .74rem var(--f-ui);color:var(--tc,var(--muted));text-transform:uppercase;letter-spacing:.05em}
+.opt.right{border-color:var(--good);background:color-mix(in srgb,var(--good) 14%,var(--paper))}
+.opt.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 14%,var(--paper))}
+.opt:disabled{cursor:default}
+#trainer .flash{min-height:0}
+#tr-fb{display:flex;flex-direction:column;gap:10px}
+#tr-fb:empty{display:none}
+.fb{font-size:1rem}
+.fb.good b:first-child{color:var(--good)} .fb.bad b:first-child{color:var(--bad)}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -163,6 +190,7 @@ body.verbs .w[data-t].sel{background:var(--tc);color:var(--paper)}
     <button role="tab" id="tab-read" aria-selected="true">Чтение</button>
     <button role="tab" id="tab-cards" aria-selected="false">Карточки</button>
     <button role="tab" id="tab-gram" aria-selected="false">Времена</button>
+    <button role="tab" id="tab-train" aria-selected="false">Тренажёр</button>
   </div>
 
   <section id="view-read" style="display:flex;flex-direction:column;gap:14px">
@@ -180,7 +208,11 @@ body.verbs .w[data-t].sel{background:var(--tc);color:var(--paper)}
     <p class="hint">Сначала попробуйте понять сами. Нажмите на слово — перевод, начальная форма и разбор времени глагола.</p>
     <article id="article"></article>
     </div>
-    <p class="src">Lector v3 · <span id="src-title"></span> · хранится только на этом устройстве · <label for="file-in" style="text-decoration:underline;cursor:pointer">загрузить другой файл</label></p>
+    <p class="src">Lector v4 · <span id="src-title"></span> · хранится только на этом устройстве · <label for="file-in" style="text-decoration:underline;cursor:pointer">загрузить другой файл</label></p>
+  </section>
+
+  <section id="view-train" hidden>
+    <div class="review" id="trainer"></div>
   </section>
 
   <section id="view-gram" hidden>
@@ -197,6 +229,7 @@ body.verbs .w[data-t].sel{background:var(--tc);color:var(--paper)}
 </div>
 
 <script src="grammar.js"></script>
+<script src="trainer.js"></script>
 <script>
 let ENTRIES=[], D={};
 
@@ -415,11 +448,15 @@ function setTab(t){
   document.getElementById("view-cards").hidden=t!=="cards";
   document.getElementById("tab-gram").setAttribute("aria-selected",t==="gram");
   document.getElementById("view-gram").hidden=t!=="gram";
+  document.getElementById("tab-train").setAttribute("aria-selected",t==="train");
+  document.getElementById("view-train").hidden=t!=="train";
+  if(t==="train"){TR=null;renderTrainer();}
   closeSheet(); if(t==="cards"){showBack=false;renderReview();} if(t==="gram")renderGrammarList();
 }
 document.getElementById("tab-read").onclick=()=>setTab("read");
 document.getElementById("tab-cards").onclick=()=>setTab("cards");
 document.getElementById("tab-gram").onclick=()=>setTab("gram");
+document.getElementById("tab-train").onclick=()=>setTab("train");
 document.getElementById("verbs-toggle").onchange=e=>{document.body.classList.toggle("verbs",e.target.checked);document.getElementById("legend").hidden=!e.target.checked;};
 renderLegend();
 
@@ -428,7 +465,7 @@ const DKEY="lector-data-v1";
 let dataTitle="";
 function applyData(obj){
   if(!obj||!Array.isArray(obj.entries)||!obj.entries.length||typeof obj.dict!=="object") throw new Error("bad");
-  ENTRIES=obj.entries; D=obj.dict; dataTitle=obj.title||"";
+  ENTRIES=obj.entries; D=obj.dict; dataTitle=obj.title||""; window.DRILLS=obj.drills||[];
   if(!ENTRIES.find(e=>e.id===current)) current=ENTRIES[0].id;
   ENTRIES.forEach(e=>e.paras.forEach((p,pi)=>p.forEach((s,si)=>sentIndex[`${e.id}-${pi}-${si}`]=s)));
 }

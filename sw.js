@@ -1,6 +1,6 @@
 // Кэш оболочки приложения: после первого открытия Lector работает без интернета.
-const CACHE = "lector-v4";
-const SHELL = ["./", "index.html", "grammar.js", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
+const CACHE = "lector-v5";
+const SHELL = ["./", "index.html", "grammar.js", "trainer.js", "manifest.webmanifest", "icon-180.png", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
