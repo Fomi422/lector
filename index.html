@@ -143,6 +143,10 @@ body.verbs .w[data-t].sel{background:var(--tc);color:var(--paper)}
 .glist summary b{font:italic 600 1.1rem var(--f-read);color:var(--tc,var(--ink))}
 .glist summary span{color:var(--muted);font-size:.88rem}
 .glist details[open] summary{margin-bottom:12px}
+.gl{font-family:var(--f-ui);font-size:.8em;font-weight:400;color:var(--verb);font-style:normal}
+.st{display:flex;flex-direction:column;gap:8px}
+.glossed{font-family:var(--f-read);font-size:1rem;line-height:1.65}
+#gloss-btn{margin-top:4px}
 @media (prefers-reduced-motion: reduce){*{transition:none!important}}
 </style>
 </head>
@@ -176,7 +180,7 @@ body.verbs .w[data-t].sel{background:var(--tc);color:var(--paper)}
     <p class="hint">Сначала попробуйте понять сами. Нажмите на слово — перевод, начальная форма и разбор времени глагола.</p>
     <article id="article"></article>
     </div>
-    <p class="src">Lector v2 · <span id="src-title"></span> · хранится только на этом устройстве · <label for="file-in" style="text-decoration:underline;cursor:pointer">загрузить другой файл</label></p>
+    <p class="src">Lector v3 · <span id="src-title"></span> · хранится только на этом устройстве · <label for="file-in" style="text-decoration:underline;cursor:pointer">загрузить другой файл</label></p>
   </section>
 
   <section id="view-gram" hidden>
@@ -227,7 +231,7 @@ function renderChips(){
   box.querySelectorAll(".chip").forEach(c=>c.remove());
   ENTRIES.forEach(e=>{
     const b=document.createElement("button");b.className="chip";b.textContent=e.title;
-    b.setAttribute("aria-pressed",e.id===current);b.onclick=()=>{current=e.id;closeSheet();renderChips();renderArticle();};
+    b.setAttribute("aria-pressed",e.id===current);b.onclick=()=>{current=e.id;showGloss=false;closeSheet();renderChips();renderArticle();};
     box.insertBefore(b,tog);
   });
 }
@@ -235,11 +239,18 @@ function renderArticle(){
   const e=ENTRIES.find(x=>x.id===current);
   let html=`<h2 class="entry-head">${e.title}</h2><div class="text">`;
   e.paras.forEach((p,pi)=>{
-    html+="<p>"+p.map((s,si)=>{const sid=`${e.id}-${pi}-${si}`;sentIndex[sid]=s;return renderSentence(s[0],sid);}).join(" ")+"</p>";
+    html+="<p>"+p.map((s,si)=>{const sid=`${e.id}-${pi}-${si}`;sentIndex[sid]=s;
+      return showGloss&&s[2]?renderGlossed(s[2],sid):renderSentence(s[0],sid);}).join(" ")+"</p>";
   });
-  html+=`</div><details class="gist"><summary>О чём статья, по-русски</summary><p>${e.gist}</p></details>`;
+  const hasGloss=e.paras.some(p=>p.some(s=>s[2]));
+  html+=`</div>${hasGloss?`<button class="sent-btn" id="gloss-btn">${showGloss?"Скрыть перевод текста":"Показать перевод текста"}</button>`:""}<details class="gist"><summary>О чём статья, по-русски</summary><p>${e.gist}</p></details>`;
   document.getElementById("article").innerHTML=html;
 }
+// Параллельный перевод: «фраза (перевод)». В тексте испанские слова остаются нажимаемыми.
+const GL=/( \([^()]*\))/;
+function renderGlossed(g,sid){return g.split(GL).map(part=>GL.test(part)?`<span class="gl">${esc(part)}</span>`:renderSentence(part,sid)).join("");}
+function glossPlain(g){return g.split(GL).map(part=>GL.test(part)?`<span class="gl">${esc(part)}</span>`:esc(part)).join("");}
+let showGloss=false;
 function refreshMarks(){
   document.querySelectorAll(".w").forEach(el=>{
     const k=el.dataset.k;
@@ -249,6 +260,7 @@ function refreshMarks(){
   renderStats();
 }
 document.getElementById("article").addEventListener("click",ev=>{
+  if(ev.target.id==="gloss-btn"){showGloss=!showGloss;closeSheet();renderArticle();if(showGloss)document.getElementById("article").scrollIntoView({block:"start",behavior:"smooth"});return;}
   const el=ev.target.closest(".w"); if(el) openWord(el);
 });
 document.getElementById("article").addEventListener("keydown",ev=>{
@@ -269,7 +281,7 @@ function openWord(el){
    ${d&&d[3]?`<div class="gram">${d[3]}</div>`:""}
    ${d&&d[4]&&d[4].length?`<div class="topics">${d[4].filter(id=>GRAMMAR[id]).map(id=>`<button class="topic-link" data-topic="${id}" data-tc="${GRAMMAR[id].tense}">Справка: ${GRAMMAR[id].name}<span>→</span></button>`).join("")}</div>`:""}
    <button class="sent-btn" id="sb">Показать перевод предложения</button>
-   <div class="sent-tr" id="st" hidden>${esc(s[1])}</div>
+   <div id="st" hidden class="st">${s[2]?`<div class="glossed">${glossPlain(s[2])}</div>`:""}<div class="sent-tr">${esc(s[1])}</div></div>
    <div class="actions">
      <button class="btn ${inCards?"on":"primary"}" id="bc">${inCards?"✓ В карточках":"В карточки"}</button>
      <button class="btn ${known?"on":""}" id="bk">${known?"✓ Знаю":"Знаю"}</button>
